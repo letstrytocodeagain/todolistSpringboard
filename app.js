@@ -25,7 +25,8 @@ addNewTask.addEventListener("submit", function(e){
 
     input.value = "";
     todoList.appendChild(newTask);
-    toggleButtonVisibility()
+    toggleButtonVisibility();
+    updateLocalStorage();
     
 })
 
@@ -36,7 +37,8 @@ todoList.addEventListener("click", function(e){
         
     }else if(e.target.tagName === "BUTTON"){
         e.target.parentNode.remove();
-        toggleButtonVisibility()
+        toggleButtonVisibility();
+        updateLocalStorage();
     }
 
 
@@ -45,6 +47,7 @@ todoList.addEventListener("click", function(e){
 clearBTN.addEventListener('click', function() {
     document.getElementById('list').innerHTML = '';
     toggleButtonVisibility();
+    updateLocalStorage();
   });
 
 function toggleButtonVisibility() {
@@ -55,5 +58,39 @@ function toggleButtonVisibility() {
     }
   }
 
- 
+//SAVE TO LOCALSTORAGE FUNCTIONS:
+
+  function updateLocalStorage() {
+    const tasks = [];
+    document.querySelectorAll("#list li span").forEach(span => {
+        tasks.push(span.textContent);
+    });
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+
+  function loadTasks() {
+    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.forEach(taskText => {
+        const newTask = document.createElement("li");
+        const doneCB = document.createElement("input");
+        doneCB.type = 'checkbox';
+        
+        const text = document.createElement("span");
+        text.textContent = taskText;
+
+        const removeBTN = document.createElement("button");
+        removeBTN.innerText = "Delete";
+
+        newTask.appendChild(doneCB);
+        newTask.appendChild(text);
+        newTask.appendChild(removeBTN);
+
+        todoList.appendChild(newTask);
+    });
+    toggleButtonVisibility();
+}
+
+
+document.addEventListener('DOMContentLoaded', loadTasks);
 
