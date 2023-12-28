@@ -34,6 +34,7 @@ todoList.addEventListener("click", function(e){
     if(e.target.tagName === "INPUT"){
         let textElement = e.target.nextSibling;
         textElement.classList.toggle("strikeText");
+        updateLocalStorage();
         
     }else if(e.target.tagName === "BUTTON"){
         e.target.parentNode.remove();
@@ -60,24 +61,35 @@ function toggleButtonVisibility() {
 
 //SAVE TO LOCALSTORAGE FUNCTIONS:
 
-  function updateLocalStorage() {
-    const tasks = [];
-    document.querySelectorAll("#list li span").forEach(span => {
-        tasks.push(span.textContent);
+
+
+function updateLocalStorage() {
+    const tasks = Array.from(todoList.children).map(li => {
+        const textElement = li.querySelector('span');
+        const checkbox = li.querySelector('input[type="checkbox"]');
+        return {
+            text: textElement.textContent,
+            completed: checkbox.checked
+        };
     });
     localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
 
-  function loadTasks() {
+function loadTasks() {
     const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.forEach(taskText => {
+    tasks.forEach(task => {
         const newTask = document.createElement("li");
+
         const doneCB = document.createElement("input");
         doneCB.type = 'checkbox';
-        
+        doneCB.checked = task.completed; // Set the checkbox to the stored state
+
         const text = document.createElement("span");
-        text.textContent = taskText;
+        text.textContent = task.text;
+        if(task.completed) {
+            text.classList.add("strikeText"); // Add the strikethrough if the task was completed
+        }
 
         const removeBTN = document.createElement("button");
         removeBTN.innerText = "Delete";
@@ -90,6 +102,7 @@ function toggleButtonVisibility() {
     });
     toggleButtonVisibility();
 }
+
 
 
 document.addEventListener('DOMContentLoaded', loadTasks);
